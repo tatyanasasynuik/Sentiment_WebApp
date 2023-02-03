@@ -13,6 +13,8 @@
 
 # to run change directory to folder location of app, then [steamlit run <appname>.py]
 
+# hosted on streamlit here: tatyanasasynuik/sentiment_webapp/main/Sentiment_WebApp.py
+
 import streamlit as st
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
@@ -29,15 +31,16 @@ st.subheader('A Web App built by Tatyana Sasynuik for the KaggleX Mentorship Coh
 #User Input
 user_in = st.text_input("Enter text to be analyzed here. (Limited to 250 characters for speed)", max_chars = 250)
 
-st.write(user_in)
-@st.cache
+
+st.write(f'Raw User Input: "{user_in}"')
+
 def process_data(text):
     lowercase = lambda x: str(text).lower()
     return lowercase
 
 st.text('Loading data...')
 data = process_data(user_in)
-st.text("Done! (using st.cache)")
+# st.text("Done! (using st.cache)")
 
 import time
 t = time.time()
@@ -45,17 +48,17 @@ processedtext = preprocess(user_in)
 st.write(f'Text Preprocessing complete.')
 st.write(f'Time Taken: {round(time.time()-t)} seconds')
 
-if st.checkbox('Show raw data'):
-    st.subheader('Raw data')
-    st.write(data)
+# if st.checkbox('Show raw data'):
+#     st.subheader('Raw data')
+#     st.write(data)
 
 st.subheader('Results from Bernoulli Naive Bayes Model')
 bnb_df = predict(vectorizer, BNBmodel, user_in)
 st.write(bnb_df)
 
-st.subheader('Results from Linear Support Vector Model')
-svc_df = predict(vectorizer, LSVCmodel, user_in)
-st.write(svc_df)
+# st.subheader('Results from Linear Support Vector Model')
+# svc_df = predict(vectorizer, LSVCmodel, user_in)
+# st.write(svc_df)
 
 
 st.subheader('Results from Linear Regression Model')
