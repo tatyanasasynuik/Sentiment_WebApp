@@ -49,6 +49,15 @@ if st.checkbox('Show raw data'):
     st.subheader('Raw data')
     st.write(data)
 
+st.subheader('Results from Bernoulli Naive Bayes Model')
+bnb_df = predict(vectorizer, BNBmodel, user_in)
+st.write(bnb_df)
+
+st.subheader('Results from Linear Support Vector Model')
+svc_df = predict(vectorizer, LSVCmodel, user_in)
+st.write(svc_df)
+
+
 st.subheader('Results from Linear Regression Model')
 LR_df = predict(vectorizer, LRmodel, user_in)
 st.write(LR_df)
