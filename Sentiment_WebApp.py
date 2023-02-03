@@ -11,39 +11,56 @@
 
 # This app is more compatible with a .py file. Converting to that.
 
+# to run change directory to folder location of app, then [steamlit run <appname>.py]
+
 import streamlit as st
-import pandas as pd
-import numpy as np
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from my_sentiment_loader import load_models, predict, preprocess
 
-st.title('Uber pickups in NYC')
 
-DATE_COLUMN = 'date/time'
-DATA_URL = ('https://s3-us-west-2.amazonaws.com/'
-            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')
+#### LOAD PICKLED MODELS ####
+vectorizer, LSVCmodel, LRmodel, BNBmodel = load_models()
 
+
+#### START APP DEV ####
+st.title('Sentiment Analyzer')
+st.subheader('A Web App built by Tatyana Sasynuik for the KaggleX Mentorship Cohort 2023')
+#User Input
+user_in = st.text_input("Enter text to be analyzed here. (Limited to 250 characters for speed)", max_chars = 250)
+
+st.write(user_in)
 @st.cache
-def load_data(nrows):
-    data = pd.read_csv(DATA_URL, nrows=nrows)
-    lowercase = lambda x: str(x).lower()
-    data.rename(lowercase, axis='columns', inplace=True)
-    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-    return data
+def process_data(text):
+    lowercase = lambda x: str(text).lower()
+    return lowercase
 
-data_load_state = st.text('Loading data...')
-data = load_data(10000)
-data_load_state.text("Done! (using st.cache)")
+st.text('Loading data...')
+data = process_data(user_in)
+st.text("Done! (using st.cache)")
+
+import time
+t = time.time()
+processedtext = preprocess(user_in)
+st.write(f'Text Preprocessing complete.')
+st.write(f'Time Taken: {round(time.time()-t)} seconds')
 
 if st.checkbox('Show raw data'):
     st.subheader('Raw data')
     st.write(data)
 
-st.subheader('Number of pickups by hour')
-hist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]
-st.bar_chart(hist_values)
+st.subheader('Results from Linear Regression Model')
+LR_df = predict(vectorizer, LRmodel, user_in)
+st.write(LR_df)
 
-# Some number in the range 0-23
-hour_to_filter = st.slider('hour', 0, 23, 17)
-filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
 
-st.subheader('Map of all pickups at %s:00' % hour_to_filter)
-st.map(filtered_data)
+st.subheader('Word Cloud of Your Input')
+
+def generate_wordcloud(text):
+    fig = plt.figure(figsize = (20,20))
+    wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
+                   collocations=False).generate(" ".join(text))
+    plt.imshow(wc)
+    return st.pyplot(fig)
+
+generate_wordcloud(user_in)
