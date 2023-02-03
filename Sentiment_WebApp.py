@@ -16,9 +16,10 @@
 # hosted on streamlit here: tatyanasasynuik/sentiment_webapp/main/Sentiment_WebApp.py
 
 import streamlit as st
+import os
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-from my_sentiment_loader import load_models, predict, preprocess
+from my_sentiment_loader import load_models, predict, preprocess, path
 
 
 #### LOAD PICKLED MODELS ####
@@ -31,6 +32,8 @@ st.subheader('A Web App built by Tatyana Sasynuik for the KaggleX Mentorship Coh
 #User Input
 user_in = st.text_input("Enter text to be analyzed here. (Limited to 250 characters for speed)", max_chars = 250)
 
+st.write(os.listdir(os.curdir))
+st.write(path)
 
 st.write(f'Raw User Input: "{user_in}"')
 
