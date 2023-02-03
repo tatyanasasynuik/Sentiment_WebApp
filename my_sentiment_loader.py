@@ -89,19 +89,19 @@ def preprocess(textdata):
 
 def load_models():
     # Load the vectorizer.
-    file = open(path+'\\vectorizer-ngram-(1,2).pickle', 'rb')
+    file = open(path+'/vectorizer-ngram-(1,2).pickle', 'rb')
     vectorizer = pickle.load(file)
     file.close()
     # Load SVC Model.
-    file = open(path+'\\LinearSVC.pickle', 'rb')
+    file = open(path+'/LinearSVC.pickle', 'rb')
     LSVCmodel = pickle.load(file)
     file.close()
     # Load the LR Model.
-    file = open(path+'\\Sentiment-LR.pickle', 'rb')
+    file = open(path+'/Sentiment-LR.pickle', 'rb')
     LRmodel = pickle.load(file)
     file.close()
     # Load the BNB Model.
-    file = open(path+'\\Sentiment-BNB.pickle', 'rb')
+    file = open(path+'/Sentiment-BNB.pickle', 'rb')
     BNBmodel = pickle.load(file)
     file.close()
     
