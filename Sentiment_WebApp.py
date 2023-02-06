@@ -106,15 +106,15 @@ try:
         text_list = process_data(user_in)
         st.write(text_list)
         
-        st.subheader('Custom Processing Output')
-        st.write(user_in)
-        text_list2 = diff_process(user_in)
-        st.write(text_list)
+        # st.subheader('Custom Processing Output')
+        # st.write(user_in)
+        # text_list2 = diff_process(user_in)
+        # st.write(text_list)
         
-        st.subheader('Imported Processing Output')
-        st.write(user_in)
-        test_sample = preprocess(user_in)
-        st.write(test_sample)
+        # st.subheader('Imported Processing Output')
+        # st.write(user_in)
+        # test_sample = preprocess(user_in)
+        # st.write(test_sample)
 
         st.subheader('Results from Bernoulli Naive Bayes Model')
         bnb_df = predict(vectorizer, BNBmodel, text_list)
