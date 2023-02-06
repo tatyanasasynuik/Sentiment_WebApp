@@ -44,48 +44,53 @@ stopwordlist = ['a', 'about', 'above', 'after', 'again', 'ain', 'all', 'am', 'an
              'why', 'will', 'with', 'won', 'y', 'you', "youd","youll", "youre",
              "youve", 'your', 'yours', 'yourself', 'yourselves']
 
+# test_in = 'testing this is getting annoying but I feel close! feeling myself'
+
 def preprocess(textdata):
-    processedText = []
-    
-    # Create Lemmatizer and Stemmer.
-    wordLemm = WordNetLemmatizer()
-    
-    # Defining regex patterns.
-    urlPattern        = r"((http://)[^ ]*|(https://)[^ ]*|( www\.)[^ ]*)"
-    userPattern       = '@[^\s]+'
-    alphaPattern      = "[^a-zA-Z0-9]"
-    sequencePattern   = r"(.)\1\1+"
-    seqReplacePattern = r"\1\1"
-    
-    for tweet in textdata:
-        tweet = tweet.lower()
-        
-        # Replace all URls with 'URL'
-        tweet = re.sub(urlPattern,' URL',tweet)
-        # Replace all emojis.
-        for emoji in emojis.keys():
-            tweet = tweet.replace(emoji, "EMOJI" + emojis[emoji])        
-        # Replace @USERNAME to 'USER'.
-        tweet = re.sub(userPattern,' USER', tweet)        
-        # Replace all non alphabets.
-        tweet = re.sub(alphaPattern, " ", tweet)
-        # Replace 3 or more consecutive letters by 2 letter.
-        tweet = re.sub(sequencePattern, seqReplacePattern, tweet)
+   textdata = [textdata]
+   processedText = []
+   
+   # Create Lemmatizer and Stemmer.
+   wordLemm = WordNetLemmatizer()
+   
+   # Defining regex patterns.
+   urlPattern        = r"((http://)[^ ]*|(https://)[^ ]*|( www\.)[^ ]*)"
+   userPattern       = '@[^\s]+'
+   alphaPattern      = "[^a-zA-Z0-9]"
+   sequencePattern   = r"(.)\1\1+"
+   seqReplacePattern = r"\1\1"
+   
+   for tweet in textdata:
+       tweet = tweet.lower()
+       
+       # Replace all URls with 'URL'
+       tweet = re.sub(urlPattern,' URL',tweet)
+       # Replace all emojis.
+       for emoji in emojis.keys():
+           tweet = tweet.replace(emoji, "EMOJI" + emojis[emoji])        
+       # Replace @USERNAME to 'USER'.
+       tweet = re.sub(userPattern,' USER', tweet)        
+       # Replace all non alphabets.
+       tweet = re.sub(alphaPattern, " ", tweet)
+       # Replace 3 or more consecutive letters by 2 letter.
+       tweet = re.sub(sequencePattern, seqReplacePattern, tweet)
 
-        tweetwords = ''
-        for word in tweet.split():
-            # Checking if the word is a stopword.
-            #if word not in stopwordlist:
-            if len(word)>1:
-                # Lemmatizing the word.
-                word = wordLemm.lemmatize(word)
-                tweetwords += (word+' ')
-            
-        processedText.append(tweetwords)
-        
-    return processedText
+       tweetwords = ''
+       for word in tweet.split():
+           # Checking if the word is a stopword.
+           if word not in stopwordlist:
+               # print(word)
+               if len(word)>1:
+                   # Lemmatizing the word.
+                   word = wordLemm.lemmatize(word)
+                   tweetwords += (word+' ')
+       processedText.append(tweetwords)
+       split = processedText[0].split(" ")
+       while("" in split):
+           split.remove("")
+       return split 
 
-
+# sample2 = preprocess(test_in)
 
 def load_models():
     # Load the vectorizer.
@@ -107,9 +112,9 @@ def load_models():
     
     return vectorizer, LSVCmodel, LRmodel, BNBmodel
 
-def predict(vectoriser, model, text):
+def predict(vectorizer, model, text):
     # Predict the sentiment
-    textdata = vectoriser.transform(preprocess(text))
+    textdata = vectorizer.transform(preprocess(text))
     sentiment = model.predict(textdata)
     
     # Make a list of text with sentiment.
