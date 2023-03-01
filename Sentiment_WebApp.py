@@ -23,6 +23,10 @@ from nltk.stem import WordNetLemmatizer
 import re
 from my_sentiment_loader import load_models, predict, preprocess, stopwordlist, emojis
 
+
+import nltk
+nltk.download('wordnet')
+
 # st.write(os.listdir(os.curdir))
 # st.write(path)
 
@@ -35,7 +39,8 @@ st.title('Sentiment Analyzer')
 st.subheader('A Web App built by Tatyana Sasynuik for the KaggleX Mentorship Cohort 2023')
 #User Input
 user_in = st.text_input("Enter text to be analyzed here.") #,max_chars=250
-test_in = 'testing this is getting annoying but I feel close! feeling myself'
+user_in = 'testing this is getting annoying but I feel close! feeling myself'
+type(user_in)
 
 #Start the clock
 import time
