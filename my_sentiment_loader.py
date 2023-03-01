@@ -14,6 +14,7 @@ import os
 import sys
 from nltk.stem import WordNetLemmatizer
 
+
 path = os.path.abspath(os.getcwd())
 
 
@@ -60,31 +61,31 @@ def preprocess(textdata):
    sequencePattern   = r"(.)\1\1+"
    seqReplacePattern = r"\1\1"
    
-   for tweet in textdata:
-       tweet = tweet.lower()
+   for text in textdata:
+       text = text.lower()
        
        # Replace all URls with 'URL'
-       tweet = re.sub(urlPattern,' URL',tweet)
+       text = re.sub(urlPattern,' URL',text)
        # Replace all emojis.
        for emoji in emojis.keys():
-           tweet = tweet.replace(emoji, "EMOJI" + emojis[emoji])        
+           text = text.replace(emoji, "EMOJI" + emojis[emoji])        
        # Replace @USERNAME to 'USER'.
-       tweet = re.sub(userPattern,' USER', tweet)        
+       text = re.sub(userPattern,' USER', text)        
        # Replace all non alphabets.
-       tweet = re.sub(alphaPattern, " ", tweet)
+       text = re.sub(alphaPattern, " ", text)
        # Replace 3 or more consecutive letters by 2 letter.
-       tweet = re.sub(sequencePattern, seqReplacePattern, tweet)
+       text = re.sub(sequencePattern, seqReplacePattern, text)
 
-       tweetwords = ''
-       for word in tweet.split():
+       textwords = ''
+       for word in text.split():
            # Checking if the word is a stopword.
            if word not in stopwordlist:
                # print(word)
                if len(word)>1:
                    # Lemmatizing the word.
                    word = wordLemm.lemmatize(word)
-                   tweetwords += (word+' ')
-       processedText.append(tweetwords)
+                   textwords += (word+' ')
+       processedText.append(textwords)
        split = processedText[0].split(" ")
        while("" in split):
            split.remove("")
