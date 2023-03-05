@@ -23,6 +23,9 @@ from nltk.stem import WordNetLemmatizer
 import re
 from my_sentiment_loader import load_models, predict, preprocess, stopwordlist, emojis
 
+import nltk
+nltk.download('wordnet')
+
 # st.write(os.listdir(os.curdir))
 # st.write(path)
 
