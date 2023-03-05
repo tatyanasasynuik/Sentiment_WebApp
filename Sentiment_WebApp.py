@@ -87,32 +87,32 @@ def diff_process(textdata):
         while("" in split):
             split.remove("")
     return split   
+
+# def process_data(text):
+#     # if word in stopwords:
+#     # lowercase = lambda x: str(text).lower()
+#     # lowered = lowercase(text)
+#     # final = lowered.split(" ")
+#     final = diff_process(text)
+#     return final
+
+# def generate_wordcloud(text):
+#     fig = plt.figure(figsize = (20,20))
+#     wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
+#                    collocations=False).generate(" ".join(text))
+#     plt.imshow(wc)
+#     return fig
+
+if len(user_in) >1:
+    text_list = diff_process(user_in) 
     
-#chunk input up into a list and convert to lowercase
-def process_data(text):
-    # if word in stopwords:
-    # lowercase = lambda x: str(text).lower()
-    # lowered = lowercase(text)
-    # final = lowered.split(" ")
-    final = diff_process(text)
-    return final
-
-def generate_wordcloud(text):
-    fig = plt.figure(figsize = (20,20))
-    wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
-                   collocations=False).generate(" ".join(text))
-    plt.imshow(wc)
-    return st.pyplot(fig)
-
-try:
+    try:
     # st.text('Loading data...')
-    if len(user_in) >1:
         #Process the data
         if st.checkbox('Show data'):
             st.subheader('Raw data')
             st.write(f'Raw User Input: "{user_in}"')
             st.subheader('Processing Output (stripped of stop words)')
-            text_list = process_data(user_in)
             st.write(text_list)
         
         # st.subheader('Custom Processing Output')
@@ -124,31 +124,37 @@ try:
         # st.write(user_in)
         # test_sample = preprocess(user_in)
         # st.write(test_sample)
-except:
+    except:
+        st.write('Oops! No data to output.')
+        
+    try:
+            st.subheader('Results from Bernoulli Naive Bayes Model')
+            bnb_df = predict(vectorizer, BNBmodel, [user_in])
+            st.write(bnb_df)
+            
+            st.subheader('Results from Linear Regression Model')
+            LR_df = predict(vectorizer, LRmodel, [user_in])
+            st.write(LR_df)
+            
+            # st.subheader('Results from Linear Support Vector Model')
+            # svc_df = predict(vectorizer, LSVCmodel, text_list)
+            # st.write(svc_df)
+    except:
+        st.write('Something went wrong with the model!')
+            
+    try:
+        st.subheader('Word Cloud of Your Input')
+        fig = plt.figure(figsize = (20,20))
+        wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
+                       collocations=False).generate(" ".join(text_list))
+        plt.imshow(wc)
+        st.pyplot(fig)
+    except:        
+        st.write('Sorry! Something went wrong building the wordcloud.')
+    
+else: 
     st.write('Waiting for user input. Write something and get your sentiment score!')
     
-try:
-        st.subheader('Results from Bernoulli Naive Bayes Model')
-        bnb_df = predict(vectorizer, BNBmodel, [user_in])
-        st.write(bnb_df)
-        
-        st.subheader('Results from Linear Regression Model')
-        LR_df = predict(vectorizer, LRmodel, [user_in])
-        st.write(LR_df)
-        
-        # st.subheader('Results from Linear Support Vector Model')
-        # svc_df = predict(vectorizer, LSVCmodel, text_list)
-        # st.write(svc_df)
-except:
-    st.write('Something went wrong with the model!')
-        
-try:
-        st.subheader('Word Cloud of Your Input')
-        generate_wordcloud(text_list)
-except:        
-    st.write('Sorry! Something went wrong building the wordcloud.')
-
-
 #timestamp the execution
 st.write('Text Processing Complete.')
 st.write(f'Time Taken: {round(time.time()-t,4)} seconds')
