@@ -23,10 +23,6 @@ from nltk.stem import WordNetLemmatizer
 import re
 from my_sentiment_loader import load_models, predict, preprocess, stopwordlist, emojis
 
-
-import nltk
-nltk.download('wordnet')
-
 # st.write(os.listdir(os.curdir))
 # st.write(path)
 
@@ -39,23 +35,20 @@ st.title('Sentiment Analyzer')
 st.subheader('A Web App built by Tatyana Sasynuik for the KaggleX Mentorship Cohort 2023')
 #User Input
 user_in = st.text_input("Enter text to be analyzed here.") #,max_chars=250
-user_in = 'testing this is getting annoying but I feel close! feeling myself'
-type(user_in)
+# user_in = 'testing this is getting annoying but I feel close! feeling myself'
+# st.write(type(user_in))
 
 #Start the clock
 import time
 t = time.time()
 
 try:
-    st.text('Loading data...')
+    # st.text('Loading data...')
     if len(user_in) >1:
-        if st.checkbox('Show raw data'):
-            st.subheader('Raw data')
-            st.write(f'Raw User Input: "{user_in}"')
-            
         def diff_process(textdata):
-            textdata = [textdata]
             processedText = []
+            textdata = [textdata]
+            # textdata = [user_in] #have to wrap in brackets not list() or it will slice to letters
             
             # Create Lemmatizer and Stemmer.
             wordLemm = WordNetLemmatizer()
@@ -67,31 +60,32 @@ try:
             sequencePattern   = r"(.)\1\1+"
             seqReplacePattern = r"\1\1"
             
-            for tweet in textdata:
-                tweet = tweet.lower()
+            for text in textdata:
+                # print(text)
+                text = text.lower()
                 
                 # Replace all URls with 'URL'
-                tweet = re.sub(urlPattern,' URL',tweet)
+                text = re.sub(urlPattern,' URL',text)
                 # Replace all emojis.
                 for emoji in emojis.keys():
-                    tweet = tweet.replace(emoji, "EMOJI" + emojis[emoji])        
+                    text = text.replace(emoji, "EMOJI" + emojis[emoji])        
                 # Replace @USERNAME to 'USER'.
-                tweet = re.sub(userPattern,' USER', tweet)        
+                text = re.sub(userPattern,' USER', text)        
                 # Replace all non alphabets.
-                tweet = re.sub(alphaPattern, " ", tweet)
+                text = re.sub(alphaPattern, " ", text)
                 # Replace 3 or more consecutive letters by 2 letter.
-                tweet = re.sub(sequencePattern, seqReplacePattern, tweet)
+                text = re.sub(sequencePattern, seqReplacePattern, text)
 
-                tweetwords = ''
-                for word in tweet.split():
+                textwords = ''
+                for word in text.split():
                     # Checking if the word is a stopword.
                     if word not in stopwordlist:
                         # print(word)
                         if len(word)>1:
                             # Lemmatizing the word.
                             word = wordLemm.lemmatize(word)
-                            tweetwords += (word+' ')
-                processedText.append(tweetwords)
+                            textwords += (word+' ')
+                processedText.append(textwords)
                 split = processedText[0].split(" ")
                 while("" in split):
                     split.remove("")
@@ -107,9 +101,12 @@ try:
             return final
         
         #Process the data
-        st.subheader('My Processing Output')
-        text_list = process_data(user_in)
-        st.write(text_list)
+        if st.checkbox('Show data'):
+            st.subheader('Raw data')
+            st.write(f'Raw User Input: "{user_in}"')
+            st.subheader('Processing Output (stripped of stop words)')
+            text_list = process_data(user_in)
+            st.write(text_list)
         
         # st.subheader('Custom Processing Output')
         # st.write(user_in)
@@ -122,11 +119,11 @@ try:
         # st.write(test_sample)
 
         st.subheader('Results from Bernoulli Naive Bayes Model')
-        bnb_df = predict(vectorizer, BNBmodel, text_list)
+        bnb_df = predict(vectorizer, BNBmodel, [user_in])
         st.write(bnb_df)
         
         st.subheader('Results from Linear Regression Model')
-        LR_df = predict(vectorizer, LRmodel, text_list)
+        LR_df = predict(vectorizer, LRmodel, [user_in])
         st.write(LR_df)
         
         # st.subheader('Results from Linear Support Vector Model')
