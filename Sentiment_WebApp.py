@@ -42,64 +42,71 @@ user_in = st.text_input("Enter text to be analyzed here.") #,max_chars=250
 import time
 t = time.time()
 
+def diff_process(textdata):
+    processedText = []
+    textdata = [textdata]
+    # textdata = [user_in] #have to wrap in brackets not list() or it will slice to letters
+    
+    # Create Lemmatizer and Stemmer.
+    wordLemm = WordNetLemmatizer()
+    
+    # Defining regex patterns.
+    urlPattern        = r"((http://)[^ ]*|(https://)[^ ]*|( www\.)[^ ]*)"
+    userPattern       = '@[^\s]+'
+    alphaPattern      = "[^a-zA-Z0-9]"
+    sequencePattern   = r"(.)\1\1+"
+    seqReplacePattern = r"\1\1"
+    
+    for text in textdata:
+        # print(text)
+        text = text.lower()
+        
+        # Replace all URls with 'URL'
+        text = re.sub(urlPattern,' URL',text)
+        # Replace all emojis.
+        for emoji in emojis.keys():
+            text = text.replace(emoji, "EMOJI" + emojis[emoji])        
+        # Replace @USERNAME to 'USER'.
+        text = re.sub(userPattern,' USER', text)        
+        # Replace all non alphabets.
+        text = re.sub(alphaPattern, " ", text)
+        # Replace 3 or more consecutive letters by 2 letter.
+        text = re.sub(sequencePattern, seqReplacePattern, text)
+
+        textwords = ''
+        for word in text.split():
+            # Checking if the word is a stopword.
+            if word not in stopwordlist:
+                # print(word)
+                if len(word)>1:
+                    # Lemmatizing the word.
+                    word = wordLemm.lemmatize(word)
+                    textwords += (word+' ')
+        processedText.append(textwords)
+        split = processedText[0].split(" ")
+        while("" in split):
+            split.remove("")
+    return split   
+    
+#chunk input up into a list and convert to lowercase
+def process_data(text):
+    # if word in stopwords:
+    # lowercase = lambda x: str(text).lower()
+    # lowered = lowercase(text)
+    # final = lowered.split(" ")
+    final = diff_process(text)
+    return final
+
+def generate_wordcloud(text):
+    fig = plt.figure(figsize = (20,20))
+    wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
+                   collocations=False).generate(" ".join(text))
+    plt.imshow(wc)
+    return st.pyplot(fig)
+
 try:
     # st.text('Loading data...')
     if len(user_in) >1:
-        def diff_process(textdata):
-            processedText = []
-            textdata = [textdata]
-            # textdata = [user_in] #have to wrap in brackets not list() or it will slice to letters
-            
-            # Create Lemmatizer and Stemmer.
-            wordLemm = WordNetLemmatizer()
-            
-            # Defining regex patterns.
-            urlPattern        = r"((http://)[^ ]*|(https://)[^ ]*|( www\.)[^ ]*)"
-            userPattern       = '@[^\s]+'
-            alphaPattern      = "[^a-zA-Z0-9]"
-            sequencePattern   = r"(.)\1\1+"
-            seqReplacePattern = r"\1\1"
-            
-            for text in textdata:
-                # print(text)
-                text = text.lower()
-                
-                # Replace all URls with 'URL'
-                text = re.sub(urlPattern,' URL',text)
-                # Replace all emojis.
-                for emoji in emojis.keys():
-                    text = text.replace(emoji, "EMOJI" + emojis[emoji])        
-                # Replace @USERNAME to 'USER'.
-                text = re.sub(userPattern,' USER', text)        
-                # Replace all non alphabets.
-                text = re.sub(alphaPattern, " ", text)
-                # Replace 3 or more consecutive letters by 2 letter.
-                text = re.sub(sequencePattern, seqReplacePattern, text)
-
-                textwords = ''
-                for word in text.split():
-                    # Checking if the word is a stopword.
-                    if word not in stopwordlist:
-                        # print(word)
-                        if len(word)>1:
-                            # Lemmatizing the word.
-                            word = wordLemm.lemmatize(word)
-                            textwords += (word+' ')
-                processedText.append(textwords)
-                split = processedText[0].split(" ")
-                while("" in split):
-                    split.remove("")
-            return split   
-            
-        #chunk input up into a list and convert to lowercase
-        def process_data(text):
-            # if word in stopwords:
-            # lowercase = lambda x: str(text).lower()
-            # lowered = lowercase(text)
-            # final = lowered.split(" ")
-            final = diff_process(text)
-            return final
-        
         #Process the data
         if st.checkbox('Show data'):
             st.subheader('Raw data')
@@ -117,7 +124,10 @@ try:
         # st.write(user_in)
         # test_sample = preprocess(user_in)
         # st.write(test_sample)
-
+except:
+    st.write('Waiting for user input. Write something and get your sentiment score!')
+    
+try:
         st.subheader('Results from Bernoulli Naive Bayes Model')
         bnb_df = predict(vectorizer, BNBmodel, [user_in])
         st.write(bnb_df)
@@ -129,21 +139,16 @@ try:
         # st.subheader('Results from Linear Support Vector Model')
         # svc_df = predict(vectorizer, LSVCmodel, text_list)
         # st.write(svc_df)
-        
-        st.subheader('Word Cloud of Your Input')
-        
-        def generate_wordcloud(text):
-            fig = plt.figure(figsize = (20,20))
-            wc = WordCloud(max_words = 1000 , width = 1600 , height = 800,
-                           collocations=False).generate(" ".join(text))
-            plt.imshow(wc)
-            return st.pyplot(fig)
-        
-        generate_wordcloud(text_list)
-        
 except:
-    st.write('Waiting for user input. Write something and get your sentiment score!')
+    st.write('Something went wrong with the model!')
+        
+try:
+        st.subheader('Word Cloud of Your Input')
+        generate_wordcloud(text_list)
+except:        
+    st.write('Sorry! Something went wrong building the wordcloud.')
+
 
 #timestamp the execution
-st.write(f'Text Processing Complete.')
+st.write('Text Processing Complete.')
 st.write(f'Time Taken: {round(time.time()-t,4)} seconds')
