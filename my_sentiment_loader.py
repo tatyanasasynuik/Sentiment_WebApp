@@ -48,7 +48,6 @@ stopwordlist = ['a', 'about', 'above', 'after', 'again', 'ain', 'all', 'am', 'an
 # test_in = 'testing this is getting annoying but I feel close! feeling myself'
 
 def preprocess(textdata):
-   textdata = [textdata]
    processedText = []
    
    # Create Lemmatizer and Stemmer.
@@ -115,8 +114,9 @@ def load_models():
 
 def predict(vectorizer, model, text):
     # Predict the sentiment
-    textdata = vectorizer.transform(preprocess(text))
-    sentiment = model.predict(textdata)
+    textdata = vectorizer.transform(text) #vectorizer.transform(preprocess(text))
+    sentiment = model.predict(text)
+    # sentiment = BNBmodel.predict(textdata)
     
     # Make a list of text with sentiment.
     data = []
@@ -127,6 +127,3 @@ def predict(vectorizer, model, text):
     df = pd.DataFrame(data, columns = ['text','sentiment'])
     df = df.replace([0,1], ["Negative","Positive"])
     return df
-
-
-
